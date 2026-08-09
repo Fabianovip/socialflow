@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "SocialFlow Dashboard"
+description = "A responsive dark web dashboard for SocialFlow, giving community managers a clear overview of bot status, key activity stats, and future channel integrations for YouTube, TikTok, Instagram, and Kick."
+version = "1.0.0"
+id = "artifacts/socialflow-dashboard"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21675
+
+[services.development]
+run = "pnpm --filter @workspace/socialflow-dashboard run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/socialflow-dashboard", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/socialflow-dashboard/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21675"
+BASE_PATH = "/"
