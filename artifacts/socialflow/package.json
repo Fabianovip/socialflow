@@ -1,0 +1,15 @@
+{
+  "name": "@workspace/socialflow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SocialFlow Discord bot",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.22.1",
+    "dotenv": "^17.2.2"
+  }
+}

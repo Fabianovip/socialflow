@@ -1,15 +1,18 @@
-# [Project name]
+# SocialFlow
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+SocialFlow is a Node.js Discord bot foundation for community workflows, with a web dashboard planned for a future iteration.
 
 ## Run & Operate
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/socialflow run dev` — run the SocialFlow Discord bot and health endpoint
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Required secret: `DISCORD_TOKEN`
+- Required env: `DISCORD_APPLICATION_ID`
+- Optional env: `DISCORD_GUILD_ID`, `PORT`
 
 ## Stack
 
@@ -19,18 +22,22 @@ _Replace the heading above with the project's name, and this line with one sente
 - Validation: Zod (`zod/v4`), `drizzle-zod`
 - API codegen: Orval (from OpenAPI spec)
 - Build: esbuild (CJS bundle)
+- Bot: Node.js, JavaScript, discord.js
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- Bot entrypoint and command handlers: `artifacts/socialflow/src/`
+- Bot setup and future extension notes: `artifacts/socialflow/README.md`
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Discord credentials are read only from environment variables; tokens are never stored in source files.
+- Slash commands are registered at startup, using a guild-specific route when `DISCORD_GUILD_ID` is provided.
+- The health endpoint is kept separate from Discord interactions so process monitoring does not require a dashboard.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+The current product is a small Discord bot with `/ping` and `/about` commands. A web dashboard can be added later without replacing the bot foundation.
 
 ## User preferences
 
