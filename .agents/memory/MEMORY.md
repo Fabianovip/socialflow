@@ -1,0 +1,1 @@
+- [Discord bot setup](discord-bot-setup.md) — Keep Discord authentication in Replit Secrets and use guild-scoped commands during active command development.
