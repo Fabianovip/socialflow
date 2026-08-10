@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import Communities from '@/pages/communities';
 import NotFound from '@/pages/not-found';
 import {
   Activity,
@@ -64,7 +65,8 @@ function useApiStatus() {
 
 function Home() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('Overview');
+  const [location, setLocation] = useLocation();
+  const [activeTab, setActiveTab] = useState(location === '/communities' ? 'Communities' : 'Overview');
   const apiStatus = useApiStatus();
   const navItems = [
     { label: 'Overview', icon: LayoutDashboard },
@@ -111,7 +113,14 @@ function Home() {
   const changeTab = (tab: string) => {
     setActiveTab(tab);
     setMobileNavOpen(false);
+    if (tab === 'Overview') setLocation('/');
+    if (tab === 'Communities') setLocation('/communities');
   };
+
+  useEffect(() => {
+    if (location === '/communities') setActiveTab('Communities');
+    if (location === '/') setActiveTab('Overview');
+  }, [location]);
 
   return (
     <div className="noise-layer min-h-[100dvh] bg-[#101729] text-[#dfe8f3]">
@@ -236,7 +245,11 @@ function Home() {
             </div>
           )}
 
-          <div className="mx-auto max-w-[1370px] px-5 pb-14 pt-9 md:px-9 md:pt-12">
+           <div className="mx-auto max-w-[1370px] px-5 pb-14 pt-9 md:px-9 md:pt-12">
+             {location === '/communities' ? (
+               <Communities />
+             ) : (
+             <>
             <section className="reveal flex flex-col justify-between gap-7 md:flex-row md:items-end">
               <div>
                 <div className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8ce3d2]">
@@ -393,6 +406,8 @@ function Home() {
                 {apiStatus === 'online' ? 'API status checked' : 'API status not available'}
               </span>
             </footer>
+             </>
+             )}
           </div>
         </main>
       </div>
@@ -594,6 +609,7 @@ function Router() {
     <RoutedErrorBoundary>
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/communities" component={Home} />
         <Route component={NotFound} />
       </Switch>
     </RoutedErrorBoundary>
