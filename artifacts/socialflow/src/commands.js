@@ -1,5 +1,7 @@
 import { SlashCommandBuilder } from "discord.js";
 
+const TIKTOK_CHANNEL_ID = "1534660973225578788";
+
 export const commandDefinitions = [
   new SlashCommandBuilder()
     .setName("ping")
@@ -15,7 +17,7 @@ export const commandDefinitions = [
 
   new SlashCommandBuilder()
     .setName("tiktok")
-    .setDescription("Publish a TikTok link in this channel.")
+    .setDescription("Publish a TikTok link.")
     .addStringOption((option) =>
       option
         .setName("link")
@@ -31,7 +33,6 @@ export async function handleCommand(interaction) {
     await interaction.reply(
       `Pong. Gateway latency: ${latency}ms.`,
     );
-
     return;
   }
 
@@ -39,7 +40,6 @@ export async function handleCommand(interaction) {
     await interaction.reply(
       "SocialFlow is your foundation for managing community workflows on Discord. More automation and a web dashboard are coming next.",
     );
-
     return;
   }
 
@@ -47,7 +47,6 @@ export async function handleCommand(interaction) {
     await interaction.reply(
       "🚀 **SocialFlow — Teste realizado com sucesso!**\n\nO bot conseguiu publicar uma mensagem neste canal.",
     );
-
     return;
   }
 
@@ -62,10 +61,35 @@ export async function handleCommand(interaction) {
       return;
     }
 
-    await interaction.reply(
-      `🎵 **Novo TikTok!**\n\n${link}`,
+    const channel = interaction.client.channels.cache.get(
+      TIKTOK_CHANNEL_ID,
     );
 
-    return;
+    if (!channel || !channel.isTextBased()) {
+      await interaction.reply({
+        content: "❌ O canal do TikTok não foi encontrado.",
+        ephemeral: true,
+      });
+      return;
+    }
+
+    try {
+      await channel.send(
+        `🎵 **Novo TikTok!**\n\n${link}`,
+      );
+
+      await interaction.reply({
+        content: "✅ TikTok publicado no canal configurado!",
+        ephemeral: true,
+      });
+    } catch (error) {
+      console.error("Failed to publish TikTok:", error);
+
+      await interaction.reply({
+        content:
+          "❌ Não consegui publicar no canal do TikTok. Verifique as permissões do bot.",
+        ephemeral: true,
+      });
+    }
   }
 }
