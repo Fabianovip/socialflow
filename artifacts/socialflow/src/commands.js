@@ -1,10 +1,5 @@
 import { SlashCommandBuilder } from "discord.js";
-
-const TIKTOK_CHANNEL_ID = "1534660973225578788";
-const YOUTUBE_CHANNEL_ID = "1534660682065379570";
-const INSTAGRAM_CHANNEL_ID = "1539503343431450624";
-const TWITCH_CHANNEL_ID = "1534660897849610292";
-const KICK_CHANNEL_ID = "1539502969047748629";
+import { CHANNELS } from "./config.js";
 
 export const commandDefinitions = [
   new SlashCommandBuilder()
@@ -77,6 +72,7 @@ export async function handleCommand(interaction) {
     await interaction.reply(
       `Pong. Gateway latency: ${latency}ms.`,
     );
+
     return;
   }
 
@@ -84,6 +80,7 @@ export async function handleCommand(interaction) {
     await interaction.reply(
       "SocialFlow is your foundation for managing community workflows on Discord. More automation and a web dashboard are coming next.",
     );
+
     return;
   }
 
@@ -91,66 +88,72 @@ export async function handleCommand(interaction) {
     await interaction.reply(
       "🚀 **SocialFlow — Teste realizado com sucesso!**\n\nO bot conseguiu publicar uma mensagem neste canal.",
     );
+
     return;
   }
 
   if (interaction.commandName === "tiktok") {
     await publishLink(
       interaction,
-      TIKTOK_CHANNEL_ID,
+      CHANNELS.tiktok,
       /^https?:\/\/(www\.)?(tiktok\.com|vm\.tiktok\.com)\//i,
       "TikTok",
       "🎵",
       "Novo TikTok!",
     );
+
     return;
   }
 
   if (interaction.commandName === "youtube") {
     await publishLink(
       interaction,
-      YOUTUBE_CHANNEL_ID,
+      CHANNELS.youtube,
       /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//i,
       "YouTube",
       "▶️",
       "Novo vídeo no YouTube!",
     );
+
     return;
   }
 
   if (interaction.commandName === "instagram") {
     await publishLink(
       interaction,
-      INSTAGRAM_CHANNEL_ID,
+      CHANNELS.instagram,
       /^https?:\/\/(www\.)?instagram\.com\//i,
       "Instagram",
       "📸",
       "Nova publicação no Instagram!",
     );
+
     return;
   }
 
   if (interaction.commandName === "twitch") {
     await publishLink(
       interaction,
-      TWITCH_CHANNEL_ID,
+      CHANNELS.twitch,
       /^https?:\/\/(www\.)?twitch\.tv\//i,
       "Twitch",
       "🟣",
       "Novo conteúdo na Twitch!",
     );
+
     return;
   }
 
   if (interaction.commandName === "kick") {
     await publishLink(
       interaction,
-      KICK_CHANNEL_ID,
+      CHANNELS.kick,
       /^https?:\/\/(www\.)?kick\.com\//i,
       "Kick",
       "🟢",
       "Novo conteúdo na Kick!",
     );
+
     return;
   }
 }
@@ -170,6 +173,7 @@ async function publishLink(
       content: `❌ Por favor, envie um link válido da ${platformName}.`,
       ephemeral: true,
     });
+
     return;
   }
 
@@ -181,6 +185,7 @@ async function publishLink(
         content: `❌ O canal da ${platformName} não é válido.`,
         ephemeral: true,
       });
+
       return;
     }
 
@@ -198,4 +203,4 @@ async function publishLink(
       ephemeral: true,
     });
   }
-}
+        }
