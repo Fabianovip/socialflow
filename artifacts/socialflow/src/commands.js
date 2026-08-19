@@ -2,6 +2,7 @@ import { SlashCommandBuilder } from "discord.js";
 
 const TIKTOK_CHANNEL_ID = "1534660973225578788";
 const YOUTUBE_CHANNEL_ID = "1534660682065379570";
+const INSTAGRAM_CHANNEL_ID = "1539503343431450624";
 
 export const commandDefinitions = [
   new SlashCommandBuilder()
@@ -33,6 +34,16 @@ export const commandDefinitions = [
       option
         .setName("link")
         .setDescription("The YouTube link to publish.")
+        .setRequired(true),
+    ),
+
+  new SlashCommandBuilder()
+    .setName("instagram")
+    .setDescription("Publish an Instagram link.")
+    .addStringOption((option) =>
+      option
+        .setName("link")
+        .setDescription("The Instagram link to publish.")
         .setRequired(true),
     ),
 ].map((command) => command.toJSON());
@@ -110,9 +121,7 @@ export async function handleCommand(interaction) {
   if (interaction.commandName === "youtube") {
     const link = interaction.options.getString("link", true);
 
-    if (
-      !/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(link)
-    ) {
+    if (!/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(link)) {
       await interaction.reply({
         content: "❌ Por favor, envie um link válido do YouTube.",
         ephemeral: true,
@@ -151,4 +160,49 @@ export async function handleCommand(interaction) {
 
     return;
   }
-        }
+
+  if (interaction.commandName === "instagram") {
+    const link = interaction.options.getString("link", true);
+
+    if (
+      !/^https?:\/\/(www\.)?(instagram\.com)\//i.test(link)
+    ) {
+      await interaction.reply({
+        content: "❌ Por favor, envie um link válido do Instagram.",
+        ephemeral: true,
+      });
+      return;
+    }
+
+    try {
+      const channel = await interaction.client.channels.fetch(
+        INSTAGRAM_CHANNEL_ID,
+      );
+
+      if (!channel || !channel.isTextBased()) {
+        await interaction.reply({
+          content: "❌ O canal do Instagram não é válido.",
+          ephemeral: true,
+        });
+        return;
+      }
+
+      await channel.send(`📸 **Nova publicação no Instagram!**\n\n${link}`);
+
+      await interaction.reply({
+        content: "✅ Instagram publicado no canal configurado!",
+        ephemeral: true,
+      });
+    } catch (error) {
+      console.error("Erro ao publicar Instagram:", error);
+
+      await interaction.reply({
+        content:
+          "❌ Não consegui publicar no canal do Instagram. Verifique as permissões do bot.",
+        ephemeral: true,
+      });
+    }
+
+    return;
+  }
+  }
