@@ -33,6 +33,7 @@ export async function handleCommand(interaction) {
     await interaction.reply(
       `Pong. Gateway latency: ${latency}ms.`,
     );
+
     return;
   }
 
@@ -40,6 +41,7 @@ export async function handleCommand(interaction) {
     await interaction.reply(
       "SocialFlow is your foundation for managing community workflows on Discord. More automation and a web dashboard are coming next.",
     );
+
     return;
   }
 
@@ -47,6 +49,7 @@ export async function handleCommand(interaction) {
     await interaction.reply(
       "🚀 **SocialFlow — Teste realizado com sucesso!**\n\nO bot conseguiu publicar uma mensagem neste canal.",
     );
+
     return;
   }
 
@@ -61,33 +64,33 @@ export async function handleCommand(interaction) {
       return;
     }
 
-    const channel = interaction.client.channels.cache.get(
-      TIKTOK_CHANNEL_ID,
-    );
-
-    if (!channel || !channel.isTextBased()) {
-      await interaction.reply({
-        content: "❌ O canal do TikTok não foi encontrado.",
-        ephemeral: true,
-      });
-      return;
-    }
-
     try {
-      await channel.send(
-        `🎵 **Novo TikTok!**\n\n${link}`,
+      const channel = await interaction.client.channels.fetch(
+        TIKTOK_CHANNEL_ID,
       );
+
+      if (!channel || !channel.isTextBased()) {
+        await interaction.reply({
+          content: "❌ O canal configurado não é um canal de texto válido.",
+          ephemeral: true,
+        });
+        return;
+      }
+
+      await channel.send({
+        content: `🎵 **Novo TikTok!**\n\n${link}`,
+      });
 
       await interaction.reply({
         content: "✅ TikTok publicado no canal configurado!",
         ephemeral: true,
       });
     } catch (error) {
-      console.error("Failed to publish TikTok:", error);
+      console.error("Erro ao publicar TikTok:", error);
 
       await interaction.reply({
         content:
-          "❌ Não consegui publicar no canal do TikTok. Verifique as permissões do bot.",
+          "❌ Não consegui publicar no canal do TikTok. Verifique se o ID está correto e se o bot possui permissão para ver e enviar mensagens nesse canal.",
         ephemeral: true,
       });
     }
