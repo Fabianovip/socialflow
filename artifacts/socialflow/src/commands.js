@@ -177,30 +177,37 @@ async function publishLink(
     return;
   }
 
+  // Responde imediatamente ao Discord.
+  await interaction.reply({
+    content: `⏳ Publicando no canal de ${platformName}...`,
+    ephemeral: true,
+  });
+
   try {
     const channel = await interaction.client.channels.fetch(channelId);
 
     if (!channel || !channel.isTextBased()) {
-      await interaction.reply({
+      await interaction.editReply({
         content: `❌ O canal da ${platformName} não é válido.`,
-        ephemeral: true,
       });
 
       return;
     }
 
-    await channel.send(`${emoji} **${messageTitle}**\n\n${link}`);
+    await channel.send({
+      content: `${emoji} **${messageTitle}**\n\n${link}`,
+    });
 
-    await interaction.reply({
+    await interaction.editReply({
       content: `✅ ${platformName} publicado no canal configurado!`,
-      ephemeral: true,
     });
   } catch (error) {
     console.error(`Erro ao publicar ${platformName}:`, error);
 
-    await interaction.reply({
-      content: `❌ Não consegui publicar no canal da ${platformName}. Verifique as permissões do bot.`,
-      ephemeral: true,
+    await interaction.editReply({
+      content:
+        `❌ Não consegui publicar no canal da ${platformName}. ` +
+        "Verifique as permissões do bot.",
     });
   }
-        }
+      }
