@@ -3,6 +3,7 @@ import { SlashCommandBuilder } from "discord.js";
 const TIKTOK_CHANNEL_ID = "1534660973225578788";
 const YOUTUBE_CHANNEL_ID = "1534660682065379570";
 const INSTAGRAM_CHANNEL_ID = "1539503343431450624";
+const TWITCH_CHANNEL_ID = "1534660897849610292";
 
 export const commandDefinitions = [
   new SlashCommandBuilder()
@@ -44,6 +45,16 @@ export const commandDefinitions = [
       option
         .setName("link")
         .setDescription("The Instagram link to publish.")
+        .setRequired(true),
+    ),
+
+  new SlashCommandBuilder()
+    .setName("twitch")
+    .setDescription("Publish a Twitch channel or live link.")
+    .addStringOption((option) =>
+      option
+        .setName("link")
+        .setDescription("The Twitch channel or live link to publish.")
         .setRequired(true),
     ),
 ].map((command) => command.toJSON());
@@ -164,9 +175,7 @@ export async function handleCommand(interaction) {
   if (interaction.commandName === "instagram") {
     const link = interaction.options.getString("link", true);
 
-    if (
-      !/^https?:\/\/(www\.)?(instagram\.com)\//i.test(link)
-    ) {
+    if (!/^https?:\/\/(www\.)?instagram\.com\//i.test(link)) {
       await interaction.reply({
         content: "❌ Por favor, envie um link válido do Instagram.",
         ephemeral: true,
@@ -187,7 +196,9 @@ export async function handleCommand(interaction) {
         return;
       }
 
-      await channel.send(`📸 **Nova publicação no Instagram!**\n\n${link}`);
+      await channel.send(
+        `📸 **Nova publicação no Instagram!**\n\n${link}`,
+      );
 
       await interaction.reply({
         content: "✅ Instagram publicado no canal configurado!",
@@ -205,4 +216,47 @@ export async function handleCommand(interaction) {
 
     return;
   }
+
+  if (interaction.commandName === "twitch") {
+    const link = interaction.options.getString("link", true);
+
+    if (!/^https?:\/\/(www\.)?twitch\.tv\//i.test(link)) {
+      await interaction.reply({
+        content: "❌ Por favor, envie um link válido da Twitch.",
+        ephemeral: true,
+      });
+      return;
+    }
+
+    try {
+      const channel = await interaction.client.channels.fetch(
+        TWITCH_CHANNEL_ID,
+      );
+
+      if (!channel || !channel.isTextBased()) {
+        await interaction.reply({
+          content: "❌ O canal da Twitch não é válido.",
+          ephemeral: true,
+        });
+        return;
+      }
+
+      await channel.send(`🟣 **Novo conteúdo na Twitch!**\n\n${link}`);
+
+      await interaction.reply({
+        content: "✅ Twitch publicado no canal configurado!",
+        ephemeral: true,
+      });
+    } catch (error) {
+      console.error("Erro ao publicar Twitch:", error);
+
+      await interaction.reply({
+        content:
+          "❌ Não consegui publicar no canal da Twitch. Verifique as permissões do bot.",
+        ephemeral: true,
+      });
+    }
+
+    return;
   }
+        }
