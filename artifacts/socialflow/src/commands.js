@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from "discord.js";
 
 const TIKTOK_CHANNEL_ID = "1534660973225578788";
+const YOUTUBE_CHANNEL_ID = "1534660682065379570";
 
 export const commandDefinitions = [
   new SlashCommandBuilder()
@@ -22,6 +23,16 @@ export const commandDefinitions = [
       option
         .setName("link")
         .setDescription("The TikTok link to publish.")
+        .setRequired(true),
+    ),
+
+  new SlashCommandBuilder()
+    .setName("youtube")
+    .setDescription("Publish a YouTube link.")
+    .addStringOption((option) =>
+      option
+        .setName("link")
+        .setDescription("The YouTube link to publish.")
         .setRequired(true),
     ),
 ].map((command) => command.toJSON());
@@ -71,15 +82,13 @@ export async function handleCommand(interaction) {
 
       if (!channel || !channel.isTextBased()) {
         await interaction.reply({
-          content: "❌ O canal configurado não é um canal de texto válido.",
+          content: "❌ O canal do TikTok não é válido.",
           ephemeral: true,
         });
         return;
       }
 
-      await channel.send({
-        content: `🎵 **Novo TikTok!**\n\n${link}`,
-      });
+      await channel.send(`🎵 **Novo TikTok!**\n\n${link}`);
 
       await interaction.reply({
         content: "✅ TikTok publicado no canal configurado!",
@@ -90,9 +99,56 @@ export async function handleCommand(interaction) {
 
       await interaction.reply({
         content:
-          "❌ Não consegui publicar no canal do TikTok. Verifique se o ID está correto e se o bot possui permissão para ver e enviar mensagens nesse canal.",
+          "❌ Não consegui publicar no canal do TikTok. Verifique as permissões do bot.",
         ephemeral: true,
       });
     }
+
+    return;
   }
-}
+
+  if (interaction.commandName === "youtube") {
+    const link = interaction.options.getString("link", true);
+
+    if (
+      !/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(link)
+    ) {
+      await interaction.reply({
+        content: "❌ Por favor, envie um link válido do YouTube.",
+        ephemeral: true,
+      });
+      return;
+    }
+
+    try {
+      const channel = await interaction.client.channels.fetch(
+        YOUTUBE_CHANNEL_ID,
+      );
+
+      if (!channel || !channel.isTextBased()) {
+        await interaction.reply({
+          content: "❌ O canal do YouTube não é válido.",
+          ephemeral: true,
+        });
+        return;
+      }
+
+      await channel.send(`▶️ **Novo vídeo no YouTube!**\n\n${link}`);
+
+      await interaction.reply({
+        content: "✅ YouTube publicado no canal configurado!",
+        ephemeral: true,
+      });
+    } catch (error) {
+      console.error("Erro ao publicar YouTube:", error);
+
+      await interaction.reply({
+        content:
+          "❌ Não consegui publicar no canal do YouTube. Verifique as permissões do bot.",
+        ephemeral: true,
+      });
+    }
+
+    return;
+  }
+        }
